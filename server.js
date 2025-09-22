@@ -1,10 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");   // allow requests from browsers/tools
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
-// In-memory "database"
+// In-memory "database" (resets if server restarts)
 let babies = {};
 
 // 🍼 Create a new baby profile
@@ -17,7 +19,7 @@ app.post("/baby/create", (req, res) => {
 
   babies[babyId] = {
     name: name || "Unnamed Baby",
-    age: age || 0, // days
+    age: age || 0, // age in days
     gender: gender || "Other",
     stats: {
       health: 100,
@@ -34,7 +36,7 @@ app.post("/baby/create", (req, res) => {
   res.json({ message: "Baby created", baby: babies[babyId] });
 });
 
-// 🍼 Get baby profile + stats
+// 🍼 Get baby profile
 app.get("/baby/:babyId", (req, res) => {
   const { babyId } = req.params;
   if (!babies[babyId]) return res.status(404).json({ error: "Baby not found" });
@@ -55,7 +57,7 @@ app.post("/baby/:babyId/update", (req, res) => {
   res.json({ message: `${stat} updated`, baby: babies[babyId] });
 });
 
-// 🍼 Add a caregiver
+// 🍼 Add caregiver
 app.post("/baby/:babyId/caregiver/add", (req, res) => {
   const { babyId } = req.params;
   const { caregiverName } = req.body;
@@ -69,7 +71,7 @@ app.post("/baby/:babyId/caregiver/add", (req, res) => {
   res.json({ message: "Caregiver added", baby: babies[babyId] });
 });
 
-// 🍼 Remove a caregiver
+// 🍼 Remove caregiver
 app.post("/baby/:babyId/caregiver/remove", (req, res) => {
   const { babyId } = req.params;
   const { caregiverName } = req.body;
