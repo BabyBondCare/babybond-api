@@ -1,35 +1,37 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(cors());
 app.use(bodyParser.json());
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("BabyBond API is running 🚼🐝");
+// Temporary in-memory storage
+let babyStats = {
+  health: 100,
+  hunger: 100,
+  thirst: 100,
+  diaper: 100,
+  hygiene: 100,
+  sleep: 100,
+  soothe: 100
+};
+
+// Endpoint to get current stats
+app.get("/stats", (req, res) => {
+  res.json(babyStats);
 });
 
-// Example: log baby care actions
-app.post("/log", (req, res) => {
-  const { babyId, caregiver, action, details } = req.body;
-
-  if (!babyId || !caregiver || !action) {
-    return res.status(400).json({ error: "Missing required fields" });
+// Endpoint to update a specific stat
+app.post("/update", (req, res) => {
+  const { stat, value } = req.body;
+  if (babyStats.hasOwnProperty(stat)) {
+    babyStats[stat] = value;
+    return res.json({ message: `${stat} updated`, stats: babyStats });
   }
-
-  console.log("Care log received:", { babyId, caregiver, action, details });
-
-  res.json({
-    success: true,
-    message: "Care log saved successfully!",
-    data: { babyId, caregiver, action, details }
-  });
+  res.status(400).json({ error: "Invalid stat" });
 });
 
+// Render sets the PORT automatically
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`BabyBond API running on port ${PORT}`);
 });
