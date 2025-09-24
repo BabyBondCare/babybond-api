@@ -1,12 +1,13 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-
-const babyRoutes = require("./routes/baby");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.json());
+// ✅ Make sure these two lines are here
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Import routes
+const babyRoutes = require("./routes/baby");
 app.use("/", babyRoutes);
 
 app.listen(PORT, () => {
